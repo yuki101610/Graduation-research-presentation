@@ -54,9 +54,10 @@
     \tableofcontents
 \end{frame}
 
-%------------------------------------------------
+%----------------------------------------------------------------------------------------
+%    
+%----------------------------------------------------------------------------------------
 \section{研究背景}
-%------------------------------------------------
 
 \begin{frame}{背景}
     LLMの高性能化に伴い, 学習効率の低さが課題として指摘されている
@@ -104,7 +105,10 @@
         学習データの選別および合成データの活用によるデータ量が100倍以上のモデルに対して, コード生成タスクにおいて匹敵する性能を達成
     \end{alertblock}
 \end{frame}
-%------------------------------------------------
+
+%----------------------------------------------------------------------------------------
+%    
+%----------------------------------------------------------------------------------------
 
 \section{モデル}
 \begin{frame}{更新式}
@@ -150,41 +154,10 @@
     \end{columns}
 \end{frame}
 
-\begin{frame}{Blocks of Highlighted Text}
-    In this slide, some important text will be \alert{highlighted} because it's important. Please, don't abuse it.
 
-    \begin{block}{Block}
-        Sample text
-    \end{block}
-
-    \begin{alertblock}{Alertblock}
-        Sample text in red box
-    \end{alertblock}
-
-    \begin{examples}
-        Sample text in green box. The title of the block is ``Examples".
-    \end{examples}
-\end{frame}
-
-%------------------------------------------------
-
-\begin{frame}{Multiple Columns}
-    \begin{columns}[c] % The "c" option specifies centered vertical alignment while the "t" option is used for top vertical alignment
-
-        \column{.45\textwidth} % Left column and width
-        \textbf{Heading}
-        \begin{enumerate}
-            \item Statement
-            \item Explanation
-            \item Example
-        \end{enumerate}
-
-        \column{.45\textwidth} % Right column and width
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer lectus nisl, ultricies in feugiat rutrum, porttitor sit amet augue. Aliquam ut tortor mauris. Sed volutpat ante purus, quis accumsan dolor.
-
-    \end{columns}
-\end{frame}
-
+%----------------------------------------------------------------------------------------
+%    
+%----------------------------------------------------------------------------------------
 
 \section{結果}
 %------------------------------------------------
@@ -210,34 +183,41 @@
     \end{table}
 \end{frame}
 
-\section{まとめ・議論}
-\begin{frame}{まとめ}
-
-    \begin{alertblock}{データのクオリティを上げる}
-        学習データの選別および合成データの活用によるデータ量が100倍以上のモデルに対して, コード生成タスクにおいて匹敵する性能を達成
-    \end{alertblock}
-\end{frame}
-
 %------------------------------------------------
+
 \begin{frame}{文法判断能力(BLiMP)の評価・考察}
     \begin{table}[htbp]
-    \caption{$\rho(W^{\mathrm{rec}})$ および$D_{\mathrm{emb}}$ の変化に伴うPerplexity}
+    \caption{$\rho(W^{\mathrm{rec}})$ と$D_{\mathrm{emb}}$の変化に伴うBLiMP精度}
     \centering
     \small
     \tabcolsep=4pt
     \begin{tabular}{l | cccccc}
         \hline
-        $\rho(W^{\mathrm{rec}})$ & 0.80 & 0.85 & 0.90 & 0.95 & 1.00 & 1.05 \\
+        スペクトル半径 $\rho(W^{\mathrm{rec}})$ & 0.80 & 0.85 & 0.90 & 0.95 & 1.00 & 1.05 \\
         \hline
-        $D_{emb}$ & \multicolumn{6}{c}{平均 Perplexity (PPL)} \\
+        次元数 $D_{emb}$ & \multicolumn{6}{c}{精度 (Macro Average)} \\
         \hline\hline
-        32  & 7849.77 & ${\color{RoyalBlue}\underline{\mathbf{7849.08}}}$ & 7850.66 & 7854.91 & 7861.96 & $7871.70$ \\
-        64  & 9226.47 & ${\color{RoyalBlue}\underline{\mathbf{9223.86}}}$ & 9223.99 & 9227.24 & 9233.84 & $9243.76$ \\
-        128 & ${\color{RoyalBlue}\underline{\mathbf{10464.76}}}$
-        & 10467.36 & 10471.31 & 10476.32 & 10482.18 & 10488.89 \\
+        32  & 55.68\% & 55.57\% & 55.48\% & 55.49\% & ${\color{RoyalBlue}\underline{\mathbf{55.50\%}}}$ & ${\color{RoyalBlue}\underline{\mathbf{55.53\%}}}$ \\
+        64  & ${\color{RoyalBlue}\underline{\mathbf{56.05\%}}}$ & ${\color{RoyalBlue}\underline{\mathbf{55.97\%}}}$ & ${\color{RoyalBlue}\underline{\mathbf{55.77\%}}}$ & ${\color{RoyalBlue}\underline{\mathbf{55.51\%}}}$ & 55.26\% & 54.93\%\\
+        128 & 55.07\% & 55.01\% & 54.92 & 54.82 & 54.70\% & 54.66\% \\
         \hline
     \end{tabular}
     \end{table}
+\end{frame}
+
+\section{まとめ・議論}
+\begin{frame}{まとめ}
+    \begin{block}{一般の時系列処理を行うRCと別の挙動を示す}
+        Sample text
+    \end{block}
+
+    \begin{alertblock}{入力するベクトルの次元数は挙げ続けても性能は上がらない}
+        Sample text in red box
+    \end{alertblock}
+
+    \begin{example}
+        次元数32でスペクトル半径が1以上のモデルは計算量を大幅に落としながらも性能を落としづらい(頑健性を持っている)
+    \end{example}
 \end{frame}
 
 \begin{frame}{Theorem}
@@ -271,6 +251,5 @@
     \bibliography{reference.bib}
     \bibliographystyle{apalike}
 \end{frame}
-
  
 \end{document}
