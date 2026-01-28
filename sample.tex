@@ -1,0 +1,276 @@
+%----------------------------------------------------------------------------------------
+%    PACKAGES AND THEMES
+%----------------------------------------------------------------------------------------
+
+\documentclass[aspectratio=169,xcolor=dvipsnames]{beamer}
+
+\usepackage{luatexja}
+\usepackage{luatexja-fontspec}
+
+
+% 日本語フォント設定（例）
+\setmainjfont{IPAexMincho}
+\setsansjfont{IPAexGothic}
+
+% 数式や欧文との相性改善（任意）
+\usepackage{amsmath, amssymb}
+\usepackage{bm} 
+
+\usetheme{SimplePlus}
+
+\usepackage{hyperref}
+\usepackage{graphicx} % Allows including images
+\usepackage{booktabs} % Allows the use of \toprule, \midrule and \bottomrule in tables
+
+%----------------------------------------------------------------------------------------
+%    タイトル
+%----------------------------------------------------------------------------------------
+
+\title{リザバー計算を用いた小規模言語モデル}
+\subtitle{Small Language Model Using Reservoir Computing}
+
+\institute
+{知能システムコース 1022194
+
+公立はこだて未来大学 香取研究室}
+\author{藤巻侑暉}
+
+
+\date{\today} % Date, can be changed to a custom date
+
+%----------------------------------------------------------------------------------------
+%    
+%----------------------------------------------------------------------------------------
+
+\begin{document}
+
+\begin{frame}
+    % Print the title page as the first slide
+    \titlepage
+\end{frame}
+
+\begin{frame}{目次}
+    % Throughout your presentation, if you choose to use \section{} and \subsection{} commands, these will automatically be printed on this slide as an overview of your presentation
+    \tableofcontents
+\end{frame}
+
+%------------------------------------------------
+\section{研究背景}
+%------------------------------------------------
+
+\begin{frame}{背景}
+    LLMの高性能化に伴い, 学習効率の低さが課題として指摘されている
+    
+    モデル規模が年々増加している
+    \begin{itemize}
+        \item 学習に必要なデータ量
+        \item モデルのパラメータ数
+        \item 計算資源
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{背景}
+    LLMの高性能化に伴い, 学習効率の低さが課題として指摘されている
+    
+    モデル規模が年々増加している
+    \begin{itemize}
+        \item 学習に必要なデータ量
+        \item モデルのパラメータ数
+        \item 計算資源
+        
+    \end{itemize}
+    \begin{block}{スケーリング則}
+        学習に用いる計算量$C$, データサイズ$D$, パラメータ数$N$と, 検証データに対するクロスエントロピー損失との間にべき乗則が成立する現象
+    \end{block}
+\end{frame}
+
+
+\begin{frame}{背景}
+
+    \begin{alertblock}{データのクオリティを上げる}
+        学習データの選別および合成データの活用によるデータ量が100倍以上のモデルに対して, コード生成タスクにおいて匹敵する性能を達成
+    \end{alertblock}
+\end{frame}
+\begin{frame}{目的}
+
+    \begin{alertblock}{データのクオリティを上げる}
+        学習データの選別および合成データの活用によるデータ量が100倍以上のモデルに対して, コード生成タスクにおいて匹敵する性能を達成
+    \end{alertblock}
+\end{frame}
+
+\begin{frame}{関連研究：リザバー計算を用いた言語モデル}
+
+    \begin{alertblock}{データのクオリティを上げる}
+        学習データの選別および合成データの活用によるデータ量が100倍以上のモデルに対して, コード生成タスクにおいて匹敵する性能を達成
+    \end{alertblock}
+\end{frame}
+%------------------------------------------------
+
+\section{モデル}
+\begin{frame}{更新式}
+    \begin{columns}[c] % The "c" option specifies centered vertical alignment while the "t" option is used for top vertical alignment
+
+        \column{.6\textwidth} % Left column and width
+        \begin{equation}
+\begin{split}
+\bm{x}(t)
+= (1 - \alpha)\bm{x}(t - 1) \\
+\quad + \alpha \Big(
+  {W}^{\mathrm{in}} \bm{d}(t)
+  + {W}^{\mathrm{rec}} \bm{r}(t - 1)
+\Big)
+\end{split}
+\end{equation}
+
+        \begin{equation}
+        \bm{r}(t) = \tanh(\bm{x}(t))
+        \label{eq:r_t}
+        \end{equation}
+
+        \begin{equation}
+\bm{y}(t) = W^{out} \bm{r}(t)
+\label{eq:y_t}
+\end{equation}
+
+        \begin{equation}
+    \bm{e}_k(t) = \bm{y}_{\mathrm{true},k}(t) - \bm{y}_k(t)
+    \label{error of miniLMS}
+\end{equation}
+
+        \begin{equation} W^{\mathrm{out}}(t+1) = W^{\mathrm{out}}(t) + \frac{\mu}{B} \sum_{k=1}^{B} \bm{e}_k(t) \bm{r}_k(t)^\top \label{eq:minibatch_lms} \end{equation}
+
+        \column{.4\textwidth} % Right column and width
+        $\bm{d}(t)\in\mathbb{R}^{N_{\mathrm{in}}}$:時刻$t$の入力\\
+        $\alpha$はリーク率\\ 
+        $W^{\mathrm{in}}\in\mathbb{R}^{N_{\mathrm{rec}}\times N_{\mathrm{in}}}$:入力層からリザバー層への結合重み\\
+        $W^{\mathrm{rec}}\in\mathbb{R}^{N_{\mathrm{rec}}\times N_{\mathrm{rec}}}$:リザバー層内の再帰結合重みである\\ 
+        $N_{\mathrm{in}}$:入力ベクトルの次元数\\ 
+        $N_{\mathrm{rec}}$:リザバー層のニューロン数
+        $\bm{y}(t)\in\mathbb{R}^{N_{out}}$:  時刻$t$におけるリザバー出力
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Blocks of Highlighted Text}
+    In this slide, some important text will be \alert{highlighted} because it's important. Please, don't abuse it.
+
+    \begin{block}{Block}
+        Sample text
+    \end{block}
+
+    \begin{alertblock}{Alertblock}
+        Sample text in red box
+    \end{alertblock}
+
+    \begin{examples}
+        Sample text in green box. The title of the block is ``Examples".
+    \end{examples}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Multiple Columns}
+    \begin{columns}[c] % The "c" option specifies centered vertical alignment while the "t" option is used for top vertical alignment
+
+        \column{.45\textwidth} % Left column and width
+        \textbf{Heading}
+        \begin{enumerate}
+            \item Statement
+            \item Explanation
+            \item Example
+        \end{enumerate}
+
+        \column{.45\textwidth} % Right column and width
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer lectus nisl, ultricies in feugiat rutrum, porttitor sit amet augue. Aliquam ut tortor mauris. Sed volutpat ante purus, quis accumsan dolor.
+
+    \end{columns}
+\end{frame}
+
+
+\section{結果}
+%------------------------------------------------
+
+\begin{frame}{次単語予測精度(Perplexity)の評価・考察}
+    \begin{table}[htbp]
+    \caption{$\rho(W^{\mathrm{rec}})$ および$D_{\mathrm{emb}}$ の変化に伴うPerplexity}
+    \centering
+    \small
+    \tabcolsep=4pt
+    \begin{tabular}{l | cccccc}
+        \hline
+        $\rho(W^{\mathrm{rec}})$ & 0.80 & 0.85 & 0.90 & 0.95 & 1.00 & 1.05 \\
+        \hline
+        $D_{emb}$ & \multicolumn{6}{c}{平均 Perplexity (PPL)} \\
+        \hline\hline
+        32  & 7849.77 & ${\color{RoyalBlue}\underline{\mathbf{7849.08}}}$ & 7850.66 & 7854.91 & 7861.96 & $7871.70$ \\
+        64  & 9226.47 & ${\color{RoyalBlue}\underline{\mathbf{9223.86}}}$ & 9223.99 & 9227.24 & 9233.84 & $9243.76$ \\
+        128 & ${\color{RoyalBlue}\underline{\mathbf{10464.76}}}$
+        & 10467.36 & 10471.31 & 10476.32 & 10482.18 & 10488.89 \\
+        \hline
+    \end{tabular}
+    \end{table}
+\end{frame}
+
+\section{まとめ・議論}
+\begin{frame}{まとめ}
+
+    \begin{alertblock}{データのクオリティを上げる}
+        学習データの選別および合成データの活用によるデータ量が100倍以上のモデルに対して, コード生成タスクにおいて匹敵する性能を達成
+    \end{alertblock}
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{文法判断能力(BLiMP)の評価・考察}
+    \begin{table}[htbp]
+    \caption{$\rho(W^{\mathrm{rec}})$ および$D_{\mathrm{emb}}$ の変化に伴うPerplexity}
+    \centering
+    \small
+    \tabcolsep=4pt
+    \begin{tabular}{l | cccccc}
+        \hline
+        $\rho(W^{\mathrm{rec}})$ & 0.80 & 0.85 & 0.90 & 0.95 & 1.00 & 1.05 \\
+        \hline
+        $D_{emb}$ & \multicolumn{6}{c}{平均 Perplexity (PPL)} \\
+        \hline\hline
+        32  & 7849.77 & ${\color{RoyalBlue}\underline{\mathbf{7849.08}}}$ & 7850.66 & 7854.91 & 7861.96 & $7871.70$ \\
+        64  & 9226.47 & ${\color{RoyalBlue}\underline{\mathbf{9223.86}}}$ & 9223.99 & 9227.24 & 9233.84 & $9243.76$ \\
+        128 & ${\color{RoyalBlue}\underline{\mathbf{10464.76}}}$
+        & 10467.36 & 10471.31 & 10476.32 & 10482.18 & 10488.89 \\
+        \hline
+    \end{tabular}
+    \end{table}
+\end{frame}
+
+\begin{frame}{Theorem}
+    \begin{theorem}[Mass--energy equivalence]
+        $E = mc^2$
+    \end{theorem}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Figure}
+    Uncomment the code on this slide to include your own image from the same directory as the template .TeX file.
+    %\begin{figure}
+    %\includegraphics[width=0.8\linewidth]{test}
+    %\end{figure}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}[fragile] % Need to use the fragile option when verbatim is used in the slide
+    \frametitle{Citation}
+    An example of the \verb|\cite| command to cite within the presentation:\\~
+
+    This statement requires citation \cite{p1}.
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{References}
+    \footnotesize
+    \bibliography{reference.bib}
+    \bibliographystyle{apalike}
+\end{frame}
+
+ 
+\end{document}
